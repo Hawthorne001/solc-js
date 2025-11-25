@@ -14,8 +14,9 @@ workflows:
       - node-v18
       - node-v20
       - node-v22
-      - node-current:
+      - node-v24:
           run_coveralls: true
+      - node-current
       - build-package
       - hardhat-sample-project: *requires_package
       - cli-smoke-test: *requires_package
@@ -32,6 +33,7 @@ workflows:
 
     jobs:
       - node-current
+      - node-v24
       - build-package
       - hardhat-sample-project: *requires_package
       - cli-smoke-test: *requires_package
@@ -336,7 +338,7 @@ jobs:
 
   solidity-solcjs-ext-test:
     docker:
-      - image: cimg/node:current
+      - image: cimg/node:lts
     steps:
       - show-npm-version
       - checkout:
@@ -369,7 +371,20 @@ jobs:
     <<: *node-base
     docker:
       - image: cimg/node:22.14
+  node-v24:
+    <<: *node-base
+    docker:
+      - image: cimg/node:24.11
   node-current:
     <<: *node-base
     docker:
       - image: cimg/node:current
+    steps:
+      - run:
+          name: Check nodejs compatibility
+          command: |
+            # TODO: Node.js v25 fails with "Maximum call stack size exceeded" on old soljson.js binaries (see issue https://github.com/argotorg/solc-js/issues/781)
+            if [[ "$(node --version)" == v25.* ]]; then
+              echo "Skipping tests on Node.js v25 - not supported yet."
+              circleci-agent step halt
+            fi
