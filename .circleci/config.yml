@@ -149,6 +149,8 @@ commands:
             if [[ -n "$GITHUB_ACCESS_TOKEN" ]]; then
               EXTRA_HEADERS=(--header "Authorization: Bearer ${GITHUB_ACCESS_TOKEN}")
             fi
+            # Pinned to hardhat v2 as v3 doesn't use soljson any longer.
+            # This test should either be removed or replaced with something else.
             HARDHAT_LATEST_RELEASE_TAG=$(
               curl \
                 --silent \
@@ -157,7 +159,7 @@ commands:
                 --show-error \
                 "${EXTRA_HEADERS[@]}" \
                 https://api.github.com/repos/nomiclabs/hardhat/releases \
-                | jq --raw-output 'map(select(.prerelease == false and (.tag_name | test("^hardhat@")))) | .[0].tag_name' \
+                | jq --raw-output 'map(select(.prerelease == false and (.tag_name | test("^hardhat@2")))) | .[0].tag_name' \
             )
             echo "export HARDHAT_LATEST_RELEASE_TAG='${HARDHAT_LATEST_RELEASE_TAG}'" >> "$BASH_ENV"
 
