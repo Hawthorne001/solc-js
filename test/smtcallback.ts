@@ -20,6 +20,11 @@ function collectErrors (solOutput) {
     if (error.message.includes('This is a pre-release compiler version')) {
       continue;
     }
+    // BMC engine deprecation notice.
+    // TODO: Remove when next solc breaking release drops support.
+    if (error.errorCode === '3993') {
+      continue;
+    }
     errors.push(error.message);
   }
   return errors;
